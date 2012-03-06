@@ -1,0 +1,4 @@
+{application,torrent_client_1}.
+{packages,[]}.
+{modules,[decode_funs,file_write,gui_controller,peer_manager_sup,
+          torrent_client_app,tracking_ser]}.

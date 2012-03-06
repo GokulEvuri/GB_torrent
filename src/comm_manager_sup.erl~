@@ -1,0 +1,60 @@
+%%%-------------------------------------------------------------------
+%%% @author: Yohanes Kuma
+%%% @doc: '18-11-2011'
+%%% @copyright: 2011 by Yohanes Kuma 
+%%%-------------------------------------------------------------------
+-module(comm_manager_sup).
+-behaviour(supervisor).
+
+%% API
+-export([start_link/0,add_child/1,add_child/4]).
+%% Supervisor callbacks
+-export([init/1]).
+
+%%%===================================================================
+%%% API functions
+%%%===================================================================
+%% @doc:
+%% starts the supervisor
+start_link() ->
+    supervisor:start_link({local, ?MODULE}, ?MODULE, []).
+
+%%--------------------------------------------------------------------
+%% @doc:
+%% adds child processes to this supervisor. unless specified the 
+%% child will have default flag of Restart = permanet,Shutdown = 2000,
+%% and Type = supervisor. 
+%% @end
+%%--------------------------------------------------------------------
+add_child(ChildSpec)->
+    supervisor: start_child(?MODULE,ChildSpec).
+add_child(Module,Function,Args,ModuleList)->
+    ChildSpec = {Module,{Module,Function,Args},
+		 permanent,2000,supervisor,ModuleList},
+    supervisor:start_child(?MODULE,ChildSpec).
+%%%===================================================================
+%%% Supervisor callbacks
+%%%===================================================================
+%%--------------------------------------------------------------------
+%% @doc:
+%% whenever a supervisor is started using supervisor:start_link/[2,3],
+%% this function is called by the new process to find out about
+%% restart strategy, maximum restart frequency and child specifications.
+%% @end
+%%--------------------------------------------------------------------
+init([]) ->
+    RestartStrategy = one_for_one,
+    MaxRestarts = 5,
+    MaxSecondsBetweenRestarts = 60,
+    SupFlags = {RestartStrategy, MaxRestarts, MaxSecondsBetweenRestarts},
+    Restart = permanent,
+    Shutdown = 2000,
+    Type = supervisor,
+   % Child_tr = {tracker_comm_sup, {tracker_comm_sup, start_link, []},
+	%	Restart, Shutdown, Type, [tracker_comm_sup]},
+    Child_up = {upload_supervisor,{upload_supervisor,start_link, []},
+    Restart, Shutdown, Type, [upload_supervisor]},
+    {ok, {SupFlags, [Child_up]}}.
+
+
+
